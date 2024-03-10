@@ -14,15 +14,18 @@ program
 
 
 program
-  .command('build')
-  .description('Клонирует репозиторий')
-  .action(() => {
+  .command('build [destination]')
+  .description('Клонирует репозиторий. Если указан аргумент ".", клонирование происходит в текущую директорию.')
+  .action((destination) => {
     console.log(`Клонирование репозитория`);
     const repoUrl = "https://github.com/FINIKKKK/flutter-template";
-    const projectName = path.basename(repoUrl, '.git'); // Извлекает имя проекта из URL
+    const projectName = path.basename(repoUrl, '.git');
     console.log(`Клонирование репозитория: ${repoUrl}`);
 
-    exec(`git clone ${repoUrl}`, (cloneError, cloneStdout, cloneStderr) => {
+    let cloneDirectory = destination === '.' ? '.' : projectName;
+    let cloneCommand = `git clone ${repoUrl} ${cloneDirectory}`;
+
+    exec(cloneCommand, (cloneError, cloneStdout, cloneStderr) => {
       if (cloneError) {
         console.error(`Ошибка при клонировании: ${cloneError.message}`);
         return;
@@ -32,8 +35,10 @@ program
       }
 
       console.log(cloneStdout || 'Репозиторий успешно клонирован.');
-      const gitDirPath = path.join(process.cwd(), projectName, '.git');
-      console.log(`Удаление папки .git в ${gitDirPath}...`);
+
+      const gitDirPath = cloneDirectory === '.' ? path.join('.', '.git') : path.join(process.cwd(), cloneDirectory, '.git');
+      // const gitDirPath = path.join(process.cwd(), projectName, '.git');
+      console.log(`Удаление папки .git`);
       fs.rm(gitDirPath, { recursive: true, force: true }, (rmError) => {
         if (rmError) {
           console.error(`Ошибка при удалении папки .git: ${rmError}`);
