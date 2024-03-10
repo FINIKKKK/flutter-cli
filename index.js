@@ -11,15 +11,25 @@ program
   .description('CLI для клонирования репозитория с помощью git clone')
   .version('1.0.0');
 
-
-
 program
   .command('build [destination]')
   .description('Клонирует репозиторий. Если указан аргумент ".", клонирование происходит в текущую директорию.')
-  .action((destination) => {
+  .action(async (destination) => {
+    const inquirer = await import('inquirer');
+
+    const answers = await inquirer.default.prompt([
+      {
+        type: 'input',
+        name: 'projectName',
+        message: 'Введите имя проекта:',
+        default: () => destination ? path.basename(destination) : "my-new-project"
+      }
+    ]);
+
     console.log(`Клонирование репозитория`);
     const repoUrl = "https://github.com/FINIKKKK/flutter-template";
     const projectName = path.basename(repoUrl, '.git');
+    console.log(`Имя проекта: ${answers.projectName}`);
     console.log(`Клонирование репозитория: ${repoUrl}`);
 
     let cloneDirectory = destination === '.' ? '.' : projectName;
@@ -37,7 +47,6 @@ program
       console.log(cloneStdout || 'Репозиторий успешно клонирован.');
 
       const gitDirPath = cloneDirectory === '.' ? path.join('.', '.git') : path.join(process.cwd(), cloneDirectory, '.git');
-      // const gitDirPath = path.join(process.cwd(), projectName, '.git');
       console.log(`Удаление папки .git`);
       fs.rm(gitDirPath, { recursive: true, force: true }, (rmError) => {
         if (rmError) {
