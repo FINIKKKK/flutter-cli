@@ -1,0 +1,14 @@
+{
+  "_comment": "===============================================",
+  "errors_auth_data": "Incorrect email or password",
+  "errors_auth_email": "This email is already in use",
+  "errors_required": "This field cannot be empty",
+  "errors_email": "Enter a valid email address",
+  "errors_min": "Must be at least {length} characters long",
+  "errors_max": "Cannot be more than {length} characters long",
+  "errors_image_required": "You have not selected an image",
+  "errors_large_image": "File size too large: {size} MB. The size should not exceed 1 MB.",
+  "_comment": "===============================================",
+
+  "_comment": "==============================================="
+}
