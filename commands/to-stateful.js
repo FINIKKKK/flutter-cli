@@ -18,7 +18,10 @@ export default function (program) {
                     // Замена StatefulWidget на StatelessWidget
                     content = content.replace(/extends StatelessWidget/g, 'extends StatefulWidget');
 
-                    const createStateMethod = `
+
+                    // Проверяем, есть ли уже метод build в классе виджета, и вставляем перед ним
+                    if (content.includes('Widget build(BuildContext context)')) {
+                        const createStateMethod = `
   @override
   ${widgetName}State createState() => ${widgetName}State();
 }
@@ -28,12 +31,8 @@ export default function (program) {
  */
 class ${widgetName}State extends State<${widgetName}> {
 `;
-                    // Проверяем, есть ли уже метод build в классе виджета, и вставляем перед ним
-                    if (content.includes('Widget build(BuildContext context)')) {
-                        content = content.replace(/(Widget build\(BuildContext context\))/, `${createStateMethod}\n$1`);
-                    } else {
-                        // Если вдруг в файле нет метода build, добавляем в конец
-                        content += createStateMethod;
+
+                        content = content.replace(/(\n+)(\s+\/\/ Builder ----------------\s+@override\s+Widget build\(BuildContext context\))/, `\n\n\t${createStateMethod.trim()}\n$2`);
                     }
 
                     return fs.promises.writeFile(filePath, content, {encoding: 'utf8'});
